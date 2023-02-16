@@ -302,9 +302,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84c0b587cd0abe84ab87d3ffe9bed79f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  phonemePresets: []
+  phonemePresets:
+  - Visemes: b
+  - Visemes: b
   skinnedMeshRenderer: {fileID: 1481947163}
-  phonemeName: 
+  phonemeName: b
 --- !u!137 &1481947163 stripped
 SkinnedMeshRenderer:
   m_CorrespondingSourceObject: {fileID: 13700000, guid: 63ae12abc50414d5c882dbe18f6a820b,

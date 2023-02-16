@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using Newtonsoft.Json;
 
 [System.Serializable]
 public class PhonemePreset
@@ -85,7 +85,8 @@ public class SaveFaceShapeVisemes : MonoBehaviour
     public void SaveIntoJson()
     {
         AddPhonemePresets(phonemeName);
-        string phonemePresetsToSave = JsonUtility.ToJson(phonemePresets);
+        string phonemePresetsToSave = JsonConvert.SerializeObject(currentPhonemePreset);
+        Debug.Log(phonemePresetsToSave);    
         System.IO.File.WriteAllText(Application.persistentDataPath + "/"+phonemeName+".json", phonemePresetsToSave);
         Debug.Log(Application.persistentDataPath);
     }
@@ -94,6 +95,10 @@ public class SaveFaceShapeVisemes : MonoBehaviour
     {
         currentPhonemePreset.Visemes = visemes;
         currentPhonemePreset.Expressions = GetCurrentBlendShapes();
+        foreach(KeyValuePair<string,float> kvp in currentPhonemePreset.Expressions)
+        { Debug.Log(kvp.Key);
+            Debug.Log(kvp.Value);
+        }
         phonemePresets.Add(currentPhonemePreset);
 
     }
@@ -170,9 +175,6 @@ public class SaveFaceShapeVisemes : MonoBehaviour
         {
             string s = blendShapeNameMesh.GetBlendShapeName(i);
             blendShapeToReturn.Add(s.Substring(12), skinnedMeshRenderer.GetBlendShapeWeight(i));
-            Debug.Log(s);
-            Debug.Log(blendShapeToReturn[s.Substring(12)]);
-
             //arr[i] = s.Substring(12);
 
             //Debug.Log(s.Substring(12));
