@@ -88,17 +88,13 @@ public class SaveFaceShapeVisemes : MonoBehaviour
         string phonemePresetsToSave = JsonConvert.SerializeObject(currentPhonemePreset);
         Debug.Log(phonemePresetsToSave);    
         System.IO.File.WriteAllText(Application.persistentDataPath + "/"+phonemeName+".json", phonemePresetsToSave);
-        Debug.Log(Application.persistentDataPath);
+        Debug.Log(Application.persistentDataPath + "/" + phonemeName + ".json");
     }
 
     void AddPhonemePresets(string visemes)
     {
-        currentPhonemePreset.Visemes = visemes;
+        currentPhonemePreset.Visemes = (string)visemes.Clone();
         currentPhonemePreset.Expressions = GetCurrentBlendShapes();
-        foreach(KeyValuePair<string,float> kvp in currentPhonemePreset.Expressions)
-        { Debug.Log(kvp.Key);
-            Debug.Log(kvp.Value);
-        }
         phonemePresets.Add(currentPhonemePreset);
 
     }
