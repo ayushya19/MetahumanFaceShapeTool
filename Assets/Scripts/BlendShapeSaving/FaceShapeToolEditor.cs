@@ -11,14 +11,17 @@ public class FaceShapeToolEditor : Editor
         base.OnInspectorGUI();
 
         SaveFaceShapeVisemes saveFaceShapeVisemes = (SaveFaceShapeVisemes)target;
-        
+        GUIStyle myBoldLabel = new GUIStyle(EditorStyles.label);
 
-        if(GUILayout.Button("Save Value"))
+        if (GUILayout.Button("Save Value"))
         {
             saveFaceShapeVisemes.SaveIntoJson();
         }
-        
+        //foreach (PhonemePreset pP in saveFaceShapeVisemes.phonemePresets)
+        //{ GUILayout.BeginHorizontal();
+        //    GUILayout.Label(pP.Visemes, myBoldLabel); }
+
     }
 
-   
+
 }

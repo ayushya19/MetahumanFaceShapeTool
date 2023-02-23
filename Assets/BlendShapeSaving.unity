@@ -290,7 +290,13 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 177089411}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1481947162
+--- !u!137 &1481947163 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 13700000, guid: 63ae12abc50414d5c882dbe18f6a820b,
+    type: 3}
+  m_PrefabInstance: {fileID: 177089411}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1481947164
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -302,17 +308,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84c0b587cd0abe84ab87d3ffe9bed79f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  phonemePresets:
-  - Visemes: b
-  - Visemes: b
+  phonemePresets: []
   skinnedMeshRenderer: {fileID: 1481947163}
-  phonemeName: b
---- !u!137 &1481947163 stripped
-SkinnedMeshRenderer:
-  m_CorrespondingSourceObject: {fileID: 13700000, guid: 63ae12abc50414d5c882dbe18f6a820b,
-    type: 3}
-  m_PrefabInstance: {fileID: 177089411}
+  phonemeName: asddsa
+--- !u!114 &1481947166
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1481947160}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2dfbe41877c85de458662c25a96062ed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  phonemeSeperator: 124
+  wordSeperator: 47
+  sentenceToSpeak: m|ey|k|er|z|/l|ae|b|/
+  skinnedMeshRenderer: {fileID: 1481947163}
 --- !u!1 &2143957491
 GameObject:
   m_ObjectHideFlags: 0
