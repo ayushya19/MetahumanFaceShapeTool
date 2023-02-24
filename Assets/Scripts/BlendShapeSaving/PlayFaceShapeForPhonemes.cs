@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 using Newtonsoft.Json;
+using System.Threading.Tasks;
 public class PlayFaceShapeForPhonemes : MonoBehaviour
 {
     // Start is called before the first frame update
@@ -22,6 +23,12 @@ public class PlayFaceShapeForPhonemes : MonoBehaviour
     public SkinnedMeshRenderer skinnedMeshRenderer;
     private List<PhonemePreset> phonemePresets=new List<PhonemePreset>();
     int i = 0;
+
+    private float fromLerp, toLerp;
+        public float speedOFChange;
+    private float lerpValueReturned;
+
+    private bool startLerping = false;
 
     
     private void Start()
@@ -61,17 +68,7 @@ public class PlayFaceShapeForPhonemes : MonoBehaviour
             currentPhoneme.Add(c.ToString());
             
 
-
-
-
         }
-
-        
-       
-        
-        
-       
-
             SpeakOutTheExpressions();
 
     }
@@ -106,36 +103,52 @@ public class PlayFaceShapeForPhonemes : MonoBehaviour
 
                 i = 0;
                 foreach(KeyValuePair<string, float> bsw in pp.Expressions)
-                {
-                    Debug.Log(bsw.Key + "  is changing");
-                    currentBlendShapeWeight=skinnedMeshRenderer.GetBlendShapeWeight(i);
-                    valueToReturn=Mathf.Lerp(currentBlendShapeWeight, bsw.Value, Time.deltaTime*0.5f);
-                    StartCoroutine(ExampleCoroutine());
-                    Debug.Log("From "+currentBlendShapeWeight+"To "+bsw.Value+" current Value  " + valueToReturn);
-                    skinnedMeshRenderer.SetBlendShapeWeight(i,valueToReturn*100);
-                    i++;
+                { 
+                        currentBlendShapeWeight = skinnedMeshRenderer.GetBlendShapeWeight(i);
+                        startLerping = true;
+                        fromLerp = currentBlendShapeWeight;
+                        toLerp = bsw.Value;
+                        Debug.Log(bsw.Key + "  is changing from " + currentBlendShapeWeight + " to " + toLerp);
+                        StartCoroutine(MoveTheBlendShapes(1f));
+
+                        i++;
+                    
                 }
                 
             }
 
         }
         
+
+
     }
 
-    IEnumerator ExampleCoroutine()
+    private void Update()
     {
-        //Print the time of when the function is first called.
-        Debug.Log("Started Coroutine at timestamp : " + Time.time);
-
-
-
-        //yield on a new YieldInstruction that waits for 5 seconds.
-        yield return new WaitForSeconds(5);
-
-        //After we have waited 5 seconds print the time again.
-        Debug.Log("Finished Coroutine at timestamp : " + Time.time);
+        
+            
+            
     }
 
+    public IEnumerator MoveTheBlendShapes(float duration)
+    {
+        float end = Time.time + duration;
+        while (Time.time < end)
+        {
+            
+            skinnedMeshRenderer.SetBlendShapeWeight(i, Time.deltaTime * speedOFChange);
+
+            
+            yield return null;
+
+        }
+
+    }
+
+
+   
+
+    
     void GetTheJsonFileAsDictionary()
     {
         string[] files = Directory.GetFiles(Application.persistentDataPath, "*.json", SearchOption.AllDirectories);

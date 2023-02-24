@@ -327,6 +327,7 @@ MonoBehaviour:
   wordSeperator: 47
   sentenceToSpeak: m|ey|k|er|z|/l|ae|b|/
   skinnedMeshRenderer: {fileID: 1481947163}
+  speedOFChange: 50
 --- !u!1 &2143957491
 GameObject:
   m_ObjectHideFlags: 0
