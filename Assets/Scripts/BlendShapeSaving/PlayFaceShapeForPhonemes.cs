@@ -7,30 +7,28 @@ using System.Threading.Tasks;
 public class PlayFaceShapeForPhonemes : MonoBehaviour
 {
     // Start is called before the first frame update
+    public SkinnedMeshRenderer skinnedMeshRenderer;
+
     public char phonemeSeperator;
     public char wordSeperator;
     public string sentenceToSpeak;
 
-    private List<string> phonemeList=new List<string>();
 
+    private List<PhonemePreset> phonemePresets=new List<PhonemePreset>();
+    private List<PhonemePreset> phonemeToSpeak;
+
+
+    private List<string> phonemeList=new List<string>();
     private List<string> currentPhoneme=new List<string>();
     private List<List<string>> wordList=new List<List<string>>();
 
-    
-
-    //public List<string> files;
-
-    public SkinnedMeshRenderer skinnedMeshRenderer;
-    private List<PhonemePreset> phonemePresets=new List<PhonemePreset>();
     int i = 0;
-
     private float fromLerp, toLerp;
-        public float speedOFChange;
-    private float lerpValueReturned;
-
+    public float speedOFChange;
     private bool startLerping = false;
+    private int frame;
 
-    
+
     private void Start()
     {
         //foreach (string filename in files)
@@ -83,102 +81,116 @@ public class PlayFaceShapeForPhonemes : MonoBehaviour
         {
             foreach(string phoneme in word)
             {
-              
-                
-                speakPhoneme(phoneme);
+
+
+                FindMatchingPhonemes(phoneme);
             }
 
         }
     }
 
-    void speakPhoneme(string phoneme)
+    void FindMatchingPhonemes(string phoneme)
     {
-        float currentBlendShapeWeight = 0f;
-        float valueToReturn = 0f;
+        
         foreach(PhonemePreset pp in phonemePresets)
         {
             if(pp.Visemes.Equals(phoneme))
             {
-                Debug.Log(phoneme+"is spoken");
-
-                i = 0;
-                foreach(KeyValuePair<string, float> bsw in pp.Expressions)
-                { 
-                        currentBlendShapeWeight = skinnedMeshRenderer.GetBlendShapeWeight(i);
-                        startLerping = true;
-                        fromLerp = currentBlendShapeWeight;
-                        toLerp = bsw.Value;
-                        Debug.Log(bsw.Key + "  is changing from " + currentBlendShapeWeight + " to " + toLerp);
-                        StartCoroutine(MoveTheBlendShapes(1f));
-
-                        i++;
-                    
-                }
-                
+                Debug.Log(phoneme+"is added");
+                PhonemePreset temp = new PhonemePreset();
+                temp.Visemes = pp.Visemes;
+                temp.Expressions = pp.Expressions;
+                phonemeToSpeak.Add(temp);
             }
 
         }
-        
+
+        SpeakOutThosePhonemesIndividually();
+
 
 
     }
+
+    void SpeakOutThosePhonemesIndividually()
+    {
+        foreach(PhonemePreset pp in phonemeToSpeak)
+        {
+            SpeakOutTheKeyValuePair(pp);
+        }
+        
+        
+    }
+
+    void SpeakOutTheKeyValuePair(PhonemePreset pp)
+    {
+        int i = 0;
+        foreach (KeyValuePair<string, float> kvp in pp.Expressions)
+        {while (fromLerp != toLerp)
+            {
+                fromLerp = skinnedMeshRenderer.GetBlendShapeWeight(i);
+                toLerp = kvp.Value;
+                startLerping = true;
+            }
+            i++;
+        }
+    }
+
+
 
     private void Update()
     {
-        
-            
-            
+        Debug.Log("frame " + frame);
+       if(startLerping)
+        {
+            fromLerp = Mathf.MoveTowards(fromLerp, toLerp,speedOFChange );
+            skinnedMeshRenderer.SetBlendShapeWeight(i, fromLerp);
+            if(fromLerp==toLerp)
+            {
+                startLerping = false;
+            }
+        }
+        frame++;
     }
 
-    public IEnumerator MoveTheBlendShapes(float duration)
+    public IEnumerator MoveTheBlendShapes(PhonemePreset pp)
     {
-        float end = Time.time + duration;
-        while (Time.time < end)
+        //float end = Time.time + duration;
+        foreach (KeyValuePair<string, float> bsw in pp.Expressions)
         {
-            
-            skinnedMeshRenderer.SetBlendShapeWeight(i, Time.deltaTime * speedOFChange);
+            float currentBlendShapeWeight = skinnedMeshRenderer.GetBlendShapeWeight(i);
+            fromLerp = currentBlendShapeWeight;
+            toLerp = bsw.Value;
+            Debug.Log(bsw.Key + "  is changing from " + currentBlendShapeWeight + " to " + toLerp);
 
-            
-            yield return null;
+            while (fromLerp != toLerp)
+            {
+                yield return new WaitForEndOfFrame();
+                Debug.Log(Time.frameCount);
+                fromLerp = Mathf.MoveTowards(fromLerp, toLerp, 1);
+                skinnedMeshRenderer.SetBlendShapeWeight(i, fromLerp);
 
+            }
         }
 
+
+        
+        
+
+
+
+
     }
-
-
-   
 
     
     void GetTheJsonFileAsDictionary()
     {
         string[] files = Directory.GetFiles(Application.persistentDataPath, "*.json", SearchOption.AllDirectories);
-        
-        int i = 0;
-        float randomValue;
         foreach (string fileN in files)
         { 
             if (File.Exists(fileN))
             {
-                // Read the entire file and save its contents.
                 string fileContents = File.ReadAllText(fileN);
-                //Debug.Log(fileContents);
                 phonemePresets.Add(JsonConvert.DeserializeObject<PhonemePreset>(fileContents));
-
-
-                //phonemePresets[i].Expressions.TryGetValue("eyeBlink_L", out randomValue);
-                //Debug.Log(randomValue);
-                //int j = 0;
-                
-                //foreach(KeyValuePair<string,float> bS in phonemePresets[i].Expressions)
-                //{
-                //    Debug.Log("going here");
-                //    Debug.Log(bS.Value);
-                //    skinnedMeshRenderer.SetBlendShapeWeight(j, bS.Value);
-                //    j++;
-                //}
-                //i++;
-                
-                //// Work with JSON
             } 
         }
 
