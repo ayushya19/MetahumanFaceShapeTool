@@ -5,6 +5,8 @@ using System.IO;
 using Newtonsoft.Json;
 using System.Threading.Tasks;
 using System;
+
+
 public class PlayFaceShapeForPhonemes : MonoBehaviour
 {
     // Start is called before the first frame update
@@ -29,6 +31,7 @@ public class PlayFaceShapeForPhonemes : MonoBehaviour
     private bool startLerping = false;
     private int frame;
 
+    public MovingTempScript mvtScript;
 
     private void Start()
     {
@@ -37,6 +40,89 @@ public class PlayFaceShapeForPhonemes : MonoBehaviour
         GetTheJsonFileAsDictionary(); 
 
     }
+
+    private void Update()
+    {
+        //Debug.Log("frame " + frame);
+
+        //foreach (PhonemePreset pp in phonemeToSpeak)
+        //{
+        //    Debug.Log("Speaking " + pp.Visemes);
+        //    SpeakOutThePhoneme(pp);
+
+        //}
+        //frame++;
+    }
+
+
+   
+    void SpeakOutThePhoneme(PhonemePreset pp)
+    {
+        i = 0;
+        foreach (KeyValuePair<string, float> kvp in pp.Expressions)
+        {
+
+            fromLerp = skinnedMeshRenderer.GetBlendShapeWeight(i);
+            toLerp = kvp.Value;
+            Debug.Log("for "+kvp.Key+"from " + fromLerp + "  to  " + toLerp);
+           
+             StartCoroutine(MoveTheBlendShapes()); 
+            i++;
+        }
+        if(fromLerp==toLerp)
+        { return;  }
+    }
+
+   
+
+
+
+
+
+    public IEnumerator MoveTheBlendShapes()
+    {
+        
+          //yield return(new WaitForEndOfFrame());
+            Debug.Log("lerping");
+            fromLerp = Mathf.MoveTowards(fromLerp, toLerp, 1);
+            Debug.Log(fromLerp);
+            skinnedMeshRenderer.SetBlendShapeWeight(i, fromLerp);
+        
+        yield return null;
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     void BreakPhonemeDownToExpressions(string phonemes)
     {
 
@@ -88,7 +174,8 @@ public class PlayFaceShapeForPhonemes : MonoBehaviour
             }
 
         }
-        SpeakOutThosePhonemesIndividually();
+        //SpeakOutThosePhonemesIndividually();
+        mvtScript.GetPlayerReady(phonemeToSpeak);
     }
 
     void FindMatchingPhonemes(string phoneme)
@@ -107,6 +194,7 @@ public class PlayFaceShapeForPhonemes : MonoBehaviour
             }
 
         }
+
         
 
 
@@ -114,87 +202,12 @@ public class PlayFaceShapeForPhonemes : MonoBehaviour
 
     }
 
-    void SpeakOutThosePhonemesIndividually()
-    {
-        foreach(PhonemePreset pp in phonemeToSpeak)
-        {
-            SpeakOutTheKeyValuePair(pp);
-
-            
-        }
-        
-        
-    }
-
-    void SpeakOutTheKeyValuePair(PhonemePreset pp)
-    {
-        i = 0;
-        foreach (KeyValuePair<string, float> kvp in pp.Expressions)
-        {
-
-            fromLerp = skinnedMeshRenderer.GetBlendShapeWeight(i);
-            toLerp = kvp.Value;
-            Debug.Log("for "+kvp.Key+"from " + fromLerp + "  to  " + toLerp);
-            while (fromLerp != toLerp)
-            {
-                Debug.Log("lerping");
-                StartCoroutine(MoveTheBlendShapes());
-                //startLerping = true;
-            }
-            i++;
-        }
-    }
-
-
-
-    private void Update()
-    {
-        Debug.Log("frame " + frame);
-       //if(startLerping)
-       // {
-       //     fromLerp = Mathf.MoveTowards(fromLerp, toLerp,speedOFChange );
-       //     skinnedMeshRenderer.SetBlendShapeWeight(i, fromLerp);
-       //     Debug.Log(fromLerp);
-       //     if(fromLerp==toLerp)
-       //     {
-       //         startLerping = false;
-       //     }
-       // }
-        frame++;
-    }
-
-    public IEnumerator MoveTheBlendShapes()
-    {
-        //float end = Time.time + duration;
-        //foreach (KeyValuePair<string, float> bsw in pp.Expressions)
-        //{
-        //    float currentBlendShapeWeight = skinnedMeshRenderer.GetBlendShapeWeight(i);
-        //    fromLerp = currentBlendShapeWeight;
-        //    toLerp = bsw.Value;
-        //    Debug.Log(bsw.Key + "  is changing from " + currentBlendShapeWeight + " to " + toLerp);
-
-        //    while (fromLerp != toLerp)
-        //    {
-        //        yield return new WaitForEndOfFrame();
-        //        Debug.Log(Time.frameCount);
-        //        fromLerp = Mathf.MoveTowards(fromLerp, toLerp, 1);
-        //        skinnedMeshRenderer.SetBlendShapeWeight(i, fromLerp);
-
-        //    }
-        //}
-
-        fromLerp = Mathf.MoveTowards(fromLerp, toLerp, 1);
-        Debug.Log(fromLerp);
-        skinnedMeshRenderer.SetBlendShapeWeight(i, fromLerp);
-        yield return StartCoroutine(WaitFor.Frames(5));
-
-        
-        
 
 
 
 
-    }
+   
+
 
 
     public static class WaitFor
