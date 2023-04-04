@@ -2,48 +2,35 @@
 
 using System.Collections.Generic;
 using UnityEngine;
-
+using TMPro;
 public class MovingTempScript : MonoBehaviour
 {
     public SkinnedMeshRenderer skinnedMeshRenderer;
-  
-    public float transitionTime; // The amount of time it takes to transition from dictionary1 to dictionary2
-
-    // A temporary dictionary to store the intermediate values
-    private float transitionTimer; // A timer to track the progress of the transition
-    int i = 0;
-    private float temp;
-    private float currentMaxVal = 100f;
-    int j = 0;
-    private bool startLerping = false;
-
-
-    public List<Dictionary<string, float>> blendShapeValues; // list of blendshape dictionaries
+    public List<Dictionary<string, float>> blendShapeValues=new List<Dictionary<string, float>>(); // list of blendshape dictionaries
     public float animationDuration = 1f; // how long the animation should take
-    //public SkinnedMeshRenderer skinnedMeshRenderer; // reference to the SkinnedMeshRenderer
-
     private Dictionary<string, float> currentValues; // current blendshape values
     private Dictionary<string, float> targetValues; // target blendshape values
-    private float animationStartTime; // time the animation started
+    public TMP_Text whatIsSpeakin;
+    private List<Dictionary<string, float[]>> differences = new List<Dictionary<string,float[]>>();
+    private float[] currentDifference=new float[2];
+    Dictionary<string, float[]> currentDifferenceDictionary = new Dictionary<string, float[]>();
+    private bool dictionaryFilled = false;
+    float animationStartTime = 0f;
 
-    
-
+    private int toCount = 0;
     public void GetPlayerReady(List<PhonemePreset> phonemePresetToSpeak)
     {
         for (int j = 0; j < phonemePresetToSpeak.Count; j++)
         {
-            Debug.Log(phonemePresetToSpeak[j].Visemes);
+           
             blendShapeValues.Add(new Dictionary<string, float>());
             foreach (KeyValuePair<string, float> kvp in phonemePresetToSpeak[j].Expressions)
             {
                 blendShapeValues[j].Add(kvp.Key, kvp.Value);
-                Debug.Log(kvp.Key + "   is key" + kvp.Value + "  is value");
+               
             }
 
         }
-        transitionTimer = 0.0f;
-        startLerping = true;
-
         currentValues = new Dictionary<string, float>();
         targetValues = new Dictionary<string, float>();
         foreach (var pair in blendShapeValues[0])
@@ -52,54 +39,200 @@ public class MovingTempScript : MonoBehaviour
             currentValues[pair.Key] = skinnedMeshRenderer.GetBlendShapeWeight(blendShapeIndex);
             targetValues[pair.Key] = pair.Value;
         }
-    }
-
-
-
-
-
-    void Update()
-    {
-
-        if (startLerping)
+        PhonemePreset currPhope = new PhonemePreset();
+        PhonemePreset nextPhope = new PhonemePreset();
+        foreach (PhonemePreset phope in phonemePresetToSpeak)
         {
-            // calculate the progress of the animation
-            float animationProgress = Mathf.Clamp01((Time.time - animationStartTime) / animationDuration);
+            
 
-            // update blendshape values
-            foreach (var pair in currentValues)
+            
+            nextPhope.Expressions = phope.Expressions;
+            nextPhope.Visemes = phope.Visemes;
+            
+            if (currPhope.Expressions.Count<=0)
             {
-                string blendShapeName = pair.Key;
-                float current = pair.Value;
-                float target = targetValues[blendShapeName];
-                int newValue = Mathf.RoundToInt(Mathf.Lerp(current, target, animationProgress));
-                int blendShapeIndex = skinnedMeshRenderer.sharedMesh.GetBlendShapeIndex(blendShapeName);
-                skinnedMeshRenderer.SetBlendShapeWeight(blendShapeIndex, newValue);
-                currentValues[blendShapeName] = newValue;
+                currPhope.Visemes = "";
+                foreach (KeyValuePair<string, float> kvp in nextPhope.Expressions)
+                {
+                    
+                    currPhope.Expressions.Add(kvp.Key, 0);
+                    
+                }
+
             }
 
-            // check if animation is finished
-            if (animationProgress == 1f)
+            FindDifferencebetweenDictionary(currPhope.Expressions, nextPhope.Expressions);
+            
+            foreach(KeyValuePair<string,float> kvp in nextPhope.Expressions)
             {
-                // set new target values for the next animation
-                targetValues.Clear();
-                currentValues.Clear();
-                foreach (var pair in blendShapeValues[0])
-                {
-                    int blendShapeIndex = skinnedMeshRenderer.sharedMesh.GetBlendShapeIndex(pair.Key);
-                    currentValues[pair.Key] = skinnedMeshRenderer.GetBlendShapeWeight(blendShapeIndex);
-                }
-                blendShapeValues.RemoveAt(0);
-                if (blendShapeValues.Count > 0)
-                {
-                    foreach (var pair in blendShapeValues[0])
-                    {
-                        targetValues[pair.Key] = pair.Value;
-                    }
-                    animationStartTime = Time.time;
-                }
+
+            currPhope.Expressions[kvp.Key] = nextPhope.Expressions[kvp.Key];
+                
+            }
+        }
+        dictionaryFilled = true;
+        
+        foreach(Dictionary<string,float[]> toShow in differences)
+        { toCount++;
+           
+            Debug.Log(toCount);
+           foreach(KeyValuePair<string,float[]> kvp in toShow)
+            {
+                Debug.Log(kvp.Key + " is the difference key from" + kvp.Value[0] + "  To" + kvp.Value[1]);
             }
         }
     }
+
+    void FindDifferencebetweenDictionary(Dictionary<string,float> dictionary1,Dictionary<string,float> dictionary2)
+    {
+            
+        
+        foreach (KeyValuePair<string, float> kvp in dictionary1)
+        {
+            if (dictionary1[kvp.Key] == dictionary2[kvp.Key]) 
+            {
+               
+            }
+            else
+            {
+                if (dictionary1[kvp.Key] < dictionary2[kvp.Key])
+                {
+                    currentDifference[0] = dictionary1[kvp.Key];
+                    currentDifference[1] = dictionary2[kvp.Key];
+                }
+                else if (dictionary1[kvp.Key] > dictionary2[kvp.Key])
+                {
+                    currentDifference[1] = dictionary1[kvp.Key];
+                    currentDifference[0] = dictionary2[kvp.Key];
+                }
+                currentDifferenceDictionary.Add(kvp.Key, currentDifference);
+                
+
+               
+
+            }
+
+            
+                //Debug.Log(currentDifferenceDictionary.Count);
+            
+        }
+               
+                
+                
+                differences.Add(new Dictionary<string, float[]>(currentDifferenceDictionary));
+                currentDifferenceDictionary.Clear();
+       
+    }
+
+
+
+    private void Update()
+    {
+        if (dictionaryFilled)
+        {
+            float animationProgress = Mathf.Clamp01((Time.time - animationStartTime) / animationDuration);
+        
+            int justCounting = 0;
+            foreach (Dictionary<string, float[]> difference in differences)
+            { justCounting++;
+                //Debug.Log(difference.Count);
+                foreach (KeyValuePair<string, float[]> singleDifference in difference)
+                {
+                    int blendShapeIndex = skinnedMeshRenderer.sharedMesh.GetBlendShapeIndex("blendShape2." + singleDifference.Key);
+                    
+                    float valueToPut = Mathf.Lerp(singleDifference.Value[0], singleDifference.Value[1], animationProgress);
+                    skinnedMeshRenderer.SetBlendShapeWeight(blendShapeIndex, valueToPut);
+                    Debug.Log(justCounting + "  Iteration from " + singleDifference.Value[0] + " to " + singleDifference.Value[1] + "Currently it is " + valueToPut+ " at "+animationProgress);
+                }
+
+
+            }
+            if (animationProgress == 1f)
+            {
+                animationStartTime = Time.time;
+            }
+
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //ON next iteration the current values are not gettin loaded
+    //void Update()
+    //{
+    //    Debug.Log(frame++);
+
+    //    if (blendShapeValues != null && blendShapeValues.Count > 0)
+    //    {
+    //        // calculate the progress of the animation
+    //        float animationProgress = Mathf.Clamp01((Time.time - animationStartTime) / animationDuration);
+
+    //        // update blendshape values
+    //        foreach (var pair in currentValues)
+    //        {
+    //            string blendShapeName = pair.Key;
+    //            float current = pair.Value;
+    //            float target = targetValues[blendShapeName];
+    //            if (current < target)
+    //            {
+    //                int blendShapeIndex = skinnedMeshRenderer.sharedMesh.GetBlendShapeIndex("blendShape2." + blendShapeName);
+    //                Debug.Log("For "+ blendShapeIndex + "  blend shape index  current value is "+ current  + " and the target value is "+ target);
+    //                float newValue = Mathf.Lerp(current, target, animationProgress);
+    //                Debug.Log(newValue + " is the new value");
+
+    //                skinnedMeshRenderer.SetBlendShapeWeight(blendShapeIndex, newValue);
+
+    //                currentValues[blendShapeName] = newValue;
+    //            }
+    //        }
+
+    //        // check if animation is finished
+    //        if (animationProgress == 1f)
+    //        {
+    //            // set new target values for the next animation
+
+    //            whatIsSpeakin.text="   "+ index++ + " is spoken";
+    //            targetValues.Clear();
+    //            currentValues.Clear();
+    //            blendShapeValues.RemoveAt(0);
+    //            if (blendShapeValues.Count > 0)
+    //            {
+    //                var nextDictionary = blendShapeValues[0];
+    //                foreach (var pair in nextDictionary)
+    //                {
+    //                    targetValues[pair.Key] = pair.Value;
+    //                    int blendShapeIndex = skinnedMeshRenderer.sharedMesh.GetBlendShapeIndex("blendShape2."+pair.Key);
+    //                    currentValues[pair.Key] = skinnedMeshRenderer.GetBlendShapeWeight(blendShapeIndex);
+    //                }
+    //                animationStartTime = Time.time;
+    //            }
+    //        }
+    //    }
+
+
+
+    //}
+
+
 
 }

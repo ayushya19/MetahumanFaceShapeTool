@@ -185,7 +185,7 @@ public class PlayFaceShapeForPhonemes : MonoBehaviour
         {
             if(pp.Visemes.Equals(phoneme))
             {
-                Debug.Log(phoneme+"is added");
+                //Debug.Log(phoneme+"is added");
                 PhonemePreset temp = new PhonemePreset();
                 temp.Visemes = pp.Visemes;
                 temp.Expressions = pp.Expressions;
