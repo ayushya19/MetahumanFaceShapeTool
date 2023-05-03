@@ -11,6 +11,7 @@ public class MovingTempScript : MonoBehaviour
     private Dictionary<string, float> currentValues; // current blendshape values
     private Dictionary<string, float> targetValues; // target blendshape values
     public TMP_Text whatIsSpeakin;
+    
     private List<Dictionary<string, float[]>> differences = new List<Dictionary<string,float[]>>();
     private float[] currentDifference=new float[2];
     Dictionary<string, float[]> currentDifferenceDictionary = new Dictionary<string, float[]>();
@@ -95,17 +96,24 @@ public class MovingTempScript : MonoBehaviour
             }
             else
             {
-                if (dictionary1[kvp.Key] < dictionary2[kvp.Key])
-                {
-                    currentDifference[0] = dictionary1[kvp.Key];
-                    currentDifference[1] = dictionary2[kvp.Key];
-                }
-                else if (dictionary1[kvp.Key] > dictionary2[kvp.Key])
-                {
-                    currentDifference[1] = dictionary1[kvp.Key];
-                    currentDifference[0] = dictionary2[kvp.Key];
-                }
-                currentDifferenceDictionary.Add(kvp.Key, currentDifference);
+                //if (dictionary1[kvp.Key] < dictionary2[kvp.Key])
+                //{
+                //    currentDifference[0] = dictionary1[kvp.Key];
+                //    currentDifference[1] = dictionary2[kvp.Key];
+                //}
+                //else if (dictionary1[kvp.Key] > dictionary2[kvp.Key])
+                //{
+                //    currentDifference[1] = dictionary1[kvp.Key];
+                //    currentDifference[0] = dictionary2[kvp.Key];
+
+                //}
+                currentDifference[0] = dictionary1[kvp.Key];
+                   currentDifference[1] = dictionary2[kvp.Key];
+
+                float[] tempFloatList = new float[2];
+                tempFloatList[0] = currentDifference[0];
+                tempFloatList[1] = currentDifference[1];
+                currentDifferenceDictionary.Add(kvp.Key,tempFloatList);
                 
 
                
